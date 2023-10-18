@@ -24,7 +24,7 @@ Para rodar o kafka, seguir seguintes passos:
 .\bin\windows\zookeeper-server-start.bat config\zookeeper.properties
 ```
 
-* Inicializar o Kafka:
+* Inicializar o Kafka (Por padrão é inicilizado na porta 9092):
 ```shell
 .\bin\windows\kafka-server-start.bat config\server.properties
 ```
@@ -50,3 +50,7 @@ Para rodar o kafka, seguir seguintes passos:
 ```
 Inserir `--from-beginning` para exibir mensagens desde o começo
 
+* Descrever os tópicos
+```shell
+.\bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --describe
+```
