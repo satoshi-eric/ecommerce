@@ -7,11 +7,12 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
-public class EmailService {
+public class LogService {
     public static void main(String[] args) {
         var consumer = new KafkaConsumer<String, String>(properties());
-        consumer.subscribe(Collections.singletonList("ECOMMERCE_SEND_EMAIL")); // O consumer escolhe o tópico para ouvir
+        consumer.subscribe(Pattern.compile("ECOMMERCE.*")); // O consumer escolhe o tópico para ouvir
             // É possível escutar de vários tópicos, mas não é normal
         while (true) { // Rodar continuamentee para ouvir as mensagens
             var records = consumer.poll(Duration.ofMillis(100)); // perguntar se há mensagem a ser consumida por determinado tempo, caso contrário, retorna mensagem vazia
@@ -20,17 +21,11 @@ public class EmailService {
                 for (var record : records) {
                     // Verificando se os pedidos são fraudes
                     System.out.println("__________________________________________");
-                    System.out.println("Send email");
+                    System.out.println("LOG: " + record.topic());
                     System.out.println(record.key());
                     System.out.println(record.value());
                     System.out.println(record.partition());
                     System.out.println(record.offset());
-                    try {
-                        Thread.sleep(1000); // simula processo demorado para detectar fraude
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println("Email sent");
                 }
             }
 
@@ -44,7 +39,7 @@ public class EmailService {
         properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         // serviços com grupos diferentes recebm todas as mensagens
         // serviços com o mesmo grupo dividem as mensagens entre si
-        properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, EmailService.class.getSimpleName());
+        properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, LogService.class.getSimpleName());
         return properties;
     }
 }
