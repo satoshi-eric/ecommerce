@@ -7,25 +7,29 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 public class NewOrderMain {
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         var producer = new KafkaProducer<String, String>(properties());
-        var value = "123123,321312,231312"; // ID do pedido, ID do usuário e valor da compra
-        var record = new ProducerRecord<String, String>("ECOMMERCE_NEW_ORDER", value, value); // Criando mensagem
-        Callback callback = (data, ex) -> { // Producer manda mensagem para o broker
-            // Callback para mostrar logs no terminal
-            if (ex != null) {
-                ex.printStackTrace();
-                return;
-            }
-            System.out.println("Sucesso enviando " + data.topic() + ":::partition " + data.partition() + "/ offset " + data.offset() + "/ timestamp " + data.timestamp());
-        };
-        var email = "Thanks for your order! We are processing your order";
-        var emailRecord = new ProducerRecord<>("ECOMMERCE_SEND_EMAIL", email, email);
-        producer.send(record, callback).get();  // O método send é asíncrono, para isso, usamos o get
-        producer.send(emailRecord, callback).get();
+        for (var i = 0; i < 100; i++) {
+            var key = UUID.randomUUID().toString(); // a partiação que vai receber a mensagem é determinada pela sua chave
+            var value = key + ",321312,231312"; // ID do pedido, ID do usuário e valor da compra
+            var record = new ProducerRecord<String, String>("ECOMMERCE_NEW_ORDER", key, value); // Criando mensagem
+            Callback callback = (data, ex) -> { // Producer manda mensagem para o broker
+                // Callback para mostrar logs no terminal
+                if (ex != null) {
+                    ex.printStackTrace();
+                    return;
+                }
+                System.out.println("Sucesso enviando " + data.topic() + ":::partition " + data.partition() + "/ offset " + data.offset() + "/ timestamp " + data.timestamp());
+            };
+            var email = "Thanks for your order! We are processing your order";
+            var emailRecord = new ProducerRecord<>("ECOMMERCE_SEND_EMAIL", key, email);
+            producer.send(record, callback).get();  // O método send é asíncrono, para isso, usamos o get
+            producer.send(emailRecord, callback).get();
+        }
     }
 
     private static Properties properties() {

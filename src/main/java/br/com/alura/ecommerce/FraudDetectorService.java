@@ -7,6 +7,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.UUID;
 
 public class FraudDetectorService {
     public static void main(String[] args) {
@@ -45,6 +46,8 @@ public class FraudDetectorService {
         // serviços com grupos diferentes recebm todas as mensagens
         // serviços com o mesmo grupo dividem as mensagens entre si
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, FraudDetectorService.class.getSimpleName());
+        properties.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, FraudDetectorService.class.getSimpleName() + "_" + UUID.randomUUID().toString());
+        properties.setProperty(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, "1"); // De um em um , o kafka vai commitanndo
         return properties;
     }
 }

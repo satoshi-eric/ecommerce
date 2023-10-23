@@ -50,7 +50,17 @@ Para rodar o kafka, seguir seguintes passos:
 ```
 Inserir `--from-beginning` para exibir mensagens desde o começo
 
-* Descrever os tópicos
+* Descrever os tópicos:
 ```shell
 .\bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --describe
+```
+
+* Alterar tópico:
+```shell
+.\bin\windows\kafka-topics.bat --alter --bootstrap-server localhost:9092 --topic ECOMMERCE_NEW_ORDER --partitions 3 
+```
+
+* Descrever grupos de consumo:
+```shell
+.\bin\windows\kafka-consumer-groups.bat --bootstrap-server localhost:9092 --describe --all-groups
 ```
